@@ -2,11 +2,14 @@
 set -euo pipefail
 USAGE=$(cat <<-END
     Usage: ./deploy.sh [OPTIONS] [--aliases <alias1,alias2,...>], eg. ./deploy.sh --vim --aliases=speechmatics,custom
-    Creates ~/.zshrc and ~/.tmux.conf with location
-    specific config
+    Creates XDG-compliant symlinks for dotfiles:
+    - ~/.zshenv (XDG bootstrap)
+    - ~/.config/zsh/.zshrc (main zsh config)
+    - ~/.config/zsh/.p10k.zsh (powerlevel10k theme)
+    - ~/.tmux.conf (tmux config)
 
     OPTIONS:
-        --vim                   deploy very simple vimrc config 
+        --vim                   deploy vimrc config symlink
         --aliases               specify additional alias scripts to source in .zshrc, separated by commas
 END
 )
@@ -30,25 +33,45 @@ while (( "$#" )); do
     esac
 done
 
-echo "deploying on machine..."
+echo "deploying XDG-compliant dotfiles..."
 echo "using extra aliases: ${ALIASES[@]}"
 
+# Create XDG directories
+mkdir -p $HOME/.config/zsh
+
+# XDG Bootstrap - symlink ~/.zshenv
+echo "Creating symlink: ~/.zshenv -> $DOT_DIR/config/zshenv"
+ln -sf $DOT_DIR/config/zshenv $HOME/.zshenv
+
+# Zsh setup - symlink to ~/.config/zsh/
+echo "Creating symlink: ~/.config/zsh/.zshrc -> $DOT_DIR/config/zshrc"
+ln -sf $DOT_DIR/config/zshrc $HOME/.config/zsh/.zshrc
+
+echo "Creating symlink: ~/.config/zsh/.p10k.zsh -> $DOT_DIR/config/p10k.zsh"
+ln -sf $DOT_DIR/config/p10k.zsh $HOME/.config/zsh/.p10k.zsh
+
+# Handle additional aliases if specified
+if [ -n "${ALIASES+x}" ] && [ ${#ALIASES[@]} -gt 0 ]; then
+    # Create a supplemental config file for additional aliases
+    EXTRA_ALIASES_FILE="$HOME/.config/zsh/.zshrc_aliases"
+    echo "# Additional aliases sourced by deploy.sh" > $EXTRA_ALIASES_FILE
+    for alias in "${ALIASES[@]}"; do
+        echo "source $DOT_DIR/config/aliases_${alias}.sh" >> $EXTRA_ALIASES_FILE
+    done
+    # Add source line to main zshrc if not already present
+    if ! grep -q "source.*\.zshrc_aliases" $HOME/.config/zsh/.zshrc 2>/dev/null; then
+        echo "[[ -f \$HOME/.config/zsh/.zshrc_aliases ]] && source \$HOME/.config/zsh/.zshrc_aliases" >> $HOME/.config/zsh/.zshrc
+    fi
+fi
+
 # Tmux setup
-echo "source $DOT_DIR/config/tmux.conf" > $HOME/.tmux.conf
+echo "Creating symlink: ~/.tmux.conf -> $DOT_DIR/config/tmux.conf"
+ln -sf $DOT_DIR/config/tmux.conf $HOME/.tmux.conf
 
 # Vimrc
 if [[ $VIM == "true" ]]; then
-    echo "deploying .vimrc"
-    echo "source $DOT_DIR/config/vimrc" > $HOME/.vimrc
-fi
-
-# zshrc setup
-echo "source $DOT_DIR/config/zshrc.sh" > $HOME/.zshrc
-# Append additional alias scripts if specified
-if [ -n "${ALIASES+x}" ]; then
-    for alias in "${ALIASES[@]}"; do
-        echo "source $DOT_DIR/config/aliases_${alias}.sh" >> $HOME/.zshrc
-    done
+    echo "Creating symlink: ~/.vimrc -> $DOT_DIR/config/vimrc"
+    ln -sf $DOT_DIR/config/vimrc $HOME/.vimrc
 fi
 
 echo "changing default shell to zsh"
