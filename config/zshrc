@@ -62,10 +62,12 @@ if command -v ask-sh &> /dev/null; then
   fi
 fi
 
-# Export API keys
+# Source API keys from persistent .env file (if it exists)
+if [ -f "/scratch/chloeloughridge/.env" ]; then
+  source /scratch/chloeloughridge/.env
+fi
 
 # Only show ASCII art in fully interactive shells (skip for Claude Code and similar tools)
 if [[ -o interactive ]] && [[ -z "$CLAUDE_CODE" ]]; then
   cat $CONFIG_DIR/start.txt
 fi
-export PATH="$HOME/.local/bin:$PATH"

@@ -17,9 +17,14 @@ cd /scratch/chloeloughridge/git/dotfiles
 
 # Start using zsh
 zsh
+
+# (Optional) Add your API keys
+nano /scratch/chloeloughridge/.env
 ```
 
 That's it! Your shell is now fully configured with persistence.
+
+**Don't forget**: Edit `/scratch/chloeloughridge/.env` to add your API keys (WANDB, HuggingFace, etc). See `.env.example` for the template.
 
 ---
 
@@ -37,16 +42,23 @@ That's it! Your shell is now fully configured with persistence.
 ### Auto-Configured Features
 - ✅ **Persistent storage**: All configs symlinked to `/scratch/chloeloughridge/`
 - ✅ **Auto-launch Zsh**: Bash automatically launches zsh on startup
-- ✅ **API keys exported**: WANDB and HuggingFace tokens
+- ✅ **API keys managed securely**: Stored in `/scratch/chloeloughridge/.env` (not in version control)
 - ✅ **Git directory**: `~/git` symlinked to persistent storage
 - ✅ **CLAUDE.md**: Symlinked to home directory for easy access
 - ✅ **XDG-compliant**: Configs stored in `~/.config/zsh/`
 - ✅ **Claude Code compatible**: Works seamlessly with Anthropic's Claude CLI tool
 
 ### Environment Variables
-The following are automatically exported on shell startup:
+API keys and secrets are stored in `/scratch/chloeloughridge/.env` and automatically sourced on shell startup.
+
+**Supported environment variables:**
 - `WANDB_API_KEY`: Weights & Biases authentication
 - `HF_TOKEN`: HuggingFace Hub authentication
+- `ANTHROPIC_HIGH_PRIO_API_KEY`: Anthropic API key
+- `OPENAI_API_KEY`: OpenAI API key
+- `DOCENT_API_KEY`: Docent API key
+
+**Important**: The `.env` file is stored in persistent storage but is **NOT** checked into version control for security.
 
 ---
 
@@ -103,6 +115,9 @@ The following are automatically exported on shell startup:
 4. Creates `.bashrc`, `.bash_profile`, `.profile` for auto-launching zsh
 5. Symlinks `~/git` to persistent storage
 6. Symlinks `~/CLAUDE.md` (if exists) to persistent storage
+7. Creates `/scratch/chloeloughridge/.env` template (if it doesn't exist)
+
+**Note**: After deployment, you should edit `/scratch/chloeloughridge/.env` to add your API keys. You can use `.env.example` in the repo as a template.
 
 ---
 
@@ -112,11 +127,13 @@ The following are automatically exported on shell startup:
 /scratch/chloeloughridge/
 ├── git/
 │   └── dotfiles/          # This repo
+│       ├── .env.example   # Template for .env file
 ├── .config/
 │   └── zsh/
 │       ├── .zshrc → dotfiles/config/zshrc
 │       ├── .p10k.zsh → dotfiles/config/p10k.zsh
 │       └── ohmyzsh/       # Oh-my-zsh installation
+├── .env                   # API keys and secrets (NOT in version control)
 ├── .zshenv → dotfiles/config/zshenv
 ├── .bashrc                # Auto-launches zsh
 ├── .bash_profile          # Sources .bashrc
@@ -158,9 +175,11 @@ The following are automatically exported on shell startup:
 - No errors if cargo, brew, uv, or other tools not installed
 - Gracefully skips missing files
 
-### 4. API Key Exports (config/zshrc)
-- `WANDB_API_KEY` and `HF_TOKEN` automatically exported
+### 4. API Key Management (config/zshrc, /scratch/.env)
+- API keys stored in `/scratch/chloeloughridge/.env` (not in version control)
+- Automatically sourced by zshrc on shell startup
 - Available to all scripts and Python environments
+- Supports WANDB, HuggingFace, Anthropic, OpenAI, and Docent keys
 
 ### 5. Git Directory Persistence (deploy.sh)
 - `~/git` symlinked to `/scratch/chloeloughridge/git`
@@ -188,7 +207,7 @@ The following are automatically exported on shell startup:
 ### config/zshrc
 - Loads oh-my-zsh and plugins
 - Sources aliases, extras, and key bindings
-- Exports API keys (WANDB, HuggingFace)
+- Sources API keys from `/scratch/chloeloughridge/.env`
 - Configures pyenv, fnm, micromamba (if installed)
 - Displays startup banner from `start.txt` (skipped for Claude Code)
 - Disables Powerlevel10k instant prompt for non-interactive shells
@@ -226,11 +245,14 @@ Edit `config/aliases.sh` and add your aliases:
 alias myalias='command'
 ```
 
-### Adding Environment Variables
-Edit `config/zshrc` and add exports:
+### Adding Environment Variables and API Keys
+Edit `/scratch/chloeloughridge/.env` and add your secrets:
 ```bash
+export MY_API_KEY="your-key-here"
 export MY_VAR="value"
 ```
+
+**Important**: Never commit the `.env` file to version control. It's stored in persistent storage only.
 
 ### Installing Additional Tools
 Edit `install.sh` and add to the package installation section:
@@ -279,6 +301,13 @@ PERSIST_DIR=/your/custom/path ./deploy.sh
 - The fix is already in `config/zshrc:5-7` (checks for interactive shells and `$CLAUDE_CODE` var)
 - If still having issues, manually set: `export CLAUDE_CODE=1` before launching
 
+### API keys not available in scripts
+- Check that `/scratch/chloeloughridge/.env` exists: `ls -la /scratch/chloeloughridge/.env`
+- Verify keys are exported: `env | grep -E "WANDB|HF_TOKEN|ANTHROPIC|OPENAI"`
+- Ensure zshrc is sourcing the file: `grep "source.*\.env" ~/.config/zsh/.zshrc`
+- If keys are missing, add them to `/scratch/chloeloughridge/.env` with `export` prefix
+- Reload shell: `exec zsh`
+
 ---
 
 ## Advanced Usage
@@ -326,9 +355,11 @@ exec zsh
 
 ## Security Notes
 
-⚠️ **API Keys**: This setup stores API keys in plaintext in `config/zshrc`. Keep your dotfiles repository private if pushing to GitHub or other public locations.
+⚠️ **API Keys**: This setup stores API keys in `/scratch/chloeloughridge/.env`, which is **NOT** checked into version control. This file is stored in persistent storage only. Your dotfiles repository is safe to push to GitHub as long as you don't commit the `.env` file.
 
-⚠️ **Credentials**: Never commit sensitive credentials to version control. Consider using environment-specific config files outside the repo for production systems.
+⚠️ **Credentials**: The `.env` file should never be committed to version control. The `.gitignore` in this repo excludes `.env` files by default. If you're storing additional credentials, add them to `/scratch/chloeloughridge/.env`.
+
+⚠️ **Backup**: Since `.env` is not in version control, make sure to back it up separately if you rebuild your instance or move to a new system.
 
 ---
 
@@ -385,8 +416,11 @@ p10k configure
 # Reload shell config
 exec zsh
 
-# Check what's exported
-env | grep -E "WANDB|HF_TOKEN"
+# Check what API keys are loaded
+env | grep -E "WANDB|HF_TOKEN|ANTHROPIC|OPENAI|DOCENT"
+
+# Edit API keys
+nano /scratch/chloeloughridge/.env
 ```
 
 ### File Locations
@@ -394,6 +428,7 @@ env | grep -E "WANDB|HF_TOKEN"
 - **Zsh config**: `~/.config/zsh/.zshrc`
 - **Oh-my-zsh**: `~/.config/zsh/ohmyzsh/`
 - **Persistent storage**: `/scratch/chloeloughridge/`
+- **API Keys & Secrets**: `/scratch/chloeloughridge/.env`
 - **Custom bins**: `/scratch/chloeloughridge/git/dotfiles/custom_bins/`
 
 ### Useful Links
