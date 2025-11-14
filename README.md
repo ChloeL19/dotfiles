@@ -1,77 +1,356 @@
-# dotfiles
-ZSH, Tmux, Vim and ssh setup on both local/remote machines.
+# Dotfiles - Persistent Configuration Setup
 
-## Installation
+ZSH, Tmux, Vim, and shell setup with persistent storage configured for `/scratch/chloeloughridge/`.
 
-### Step 1
-Install dependencies (e.g. oh-my-zsh and related plugins), you can specify options to install specific programs: tmux, zsh, note that your dev-vm will already have tmux and zsh installed so you don't need to provide any options in this case, but you may need to provide these if you are installing locally. 
-
-Installation on a mac machine requires homebrew so install this [from here](https://brew.sh/) first if you haven't already.
+## Quick Start (Most Common Use Case)
 
 ```bash
-# Install dependencies (remove tmux or zsh if you don't need to install them)
-./install.sh --tmux --zsh
+# Clone the repo
+git clone <repo-url> /scratch/chloeloughridge/git/dotfiles
+cd /scratch/chloeloughridge/git/dotfiles
+
+# Install zsh and dependencies
+./install.sh --zsh
+
+# Deploy all configs with vim support (recommended)
+./deploy.sh --vim
+
+# Start using zsh
+zsh
 ```
 
-### Step 2
-Deploy (e.g. source aliases for .zshrc, apply oh-my-zsh settings etc..)
+That's it! Your shell is now fully configured with persistence.
+
+---
+
+## What This Setup Provides
+
+### Installed Software
+- **Zsh** with oh-my-zsh framework
+- **Powerlevel10k** theme with custom configuration
+- **Zsh plugins**: autosuggestions, syntax-highlighting, completions, history-substring-search
+- **Tmux** with custom theme
+- **Vim** with basic configuration
+- **Custom bins**: tsesh, twin, rl, yk (in `custom_bins/`)
+- **System tools**: jq, ncdu, nvtop, htop, lsof, rsync, nano, less
+
+### Auto-Configured Features
+- ✅ **Persistent storage**: All configs symlinked to `/scratch/chloeloughridge/`
+- ✅ **Auto-launch Zsh**: Bash automatically launches zsh on startup
+- ✅ **API keys exported**: WANDB and HuggingFace tokens
+- ✅ **Git directory**: `~/git` symlinked to persistent storage
+- ✅ **CLAUDE.md**: Symlinked to home directory for easy access
+- ✅ **XDG-compliant**: Configs stored in `~/.config/zsh/`
+
+### Environment Variables
+The following are automatically exported on shell startup:
+- `WANDB_API_KEY`: Weights & Biases authentication
+- `HF_TOKEN`: HuggingFace Hub authentication
+
+---
+
+## Installation Details
+
+### Prerequisites
+- Linux system (tested on Ubuntu 22.04)
+- Access to `/scratch/chloeloughridge/` directory for persistent storage
+- Sudo privileges for installing packages
+
+### Step 1: Install Dependencies
+
 ```bash
-# Remote linux machine
-./deploy.sh  
-# (optional) Deploy with extra aliases (useful for remote machines where you want specific aliases)
-./deploy.sh --aliases=speechmatics
-# (optional) Include simple vimrc 
+./install.sh [OPTIONS]
+```
+
+**Options:**
+- `--zsh`: Install zsh shell
+- `--tmux`: Install tmux
+- `--extras`: Install additional tools (ripgrep, dust, jless, code2prompt, peco, shell-ask)
+- `--force`: Force reinstall oh-my-zsh and plugins
+
+**What it installs:**
+1. Zsh shell (if specified)
+2. System tools: jq, ncdu, nvtop, htop, lsof, rsync, nano, less
+3. UV package manager
+4. Oh-my-zsh framework
+5. Powerlevel10k theme
+6. Zsh plugins (autosuggestions, syntax-highlighting, completions, history-substring-search)
+7. Tmux themepack
+
+**Where things are installed:**
+- Oh-my-zsh → `/scratch/chloeloughridge/.config/zsh/ohmyzsh/`
+- Tmux themepack → `/scratch/chloeloughridge/.tmux-themepack/`
+- UV → `~/.local/bin/`
+
+### Step 2: Deploy Configuration
+
+```bash
+./deploy.sh [OPTIONS]
+```
+
+**Options:**
+- `--vim`: Deploy vimrc configuration
+- `--aliases=<name1,name2>`: Source additional alias files (e.g., `--aliases=speechmatics`)
+
+**Environment Variables:**
+- `PERSIST_DIR`: Override persistent directory (default: `/scratch/chloeloughridge`)
+
+**What it does:**
+1. Creates persistent storage structure in `/scratch/chloeloughridge/`
+2. Symlinks all configs to persistent directory
+3. Symlinks from `$HOME` to persistent configs
+4. Creates `.bashrc`, `.bash_profile`, `.profile` for auto-launching zsh
+5. Symlinks `~/git` to persistent storage
+6. Symlinks `~/CLAUDE.md` (if exists) to persistent storage
+
+---
+
+## File Structure After Installation
+
+```
+/scratch/chloeloughridge/
+├── git/
+│   └── dotfiles/          # This repo
+├── .config/
+│   └── zsh/
+│       ├── .zshrc → dotfiles/config/zshrc
+│       ├── .p10k.zsh → dotfiles/config/p10k.zsh
+│       └── ohmyzsh/       # Oh-my-zsh installation
+├── .zshenv → dotfiles/config/zshenv
+├── .bashrc                # Auto-launches zsh
+├── .bash_profile          # Sources .bashrc
+├── .profile → .bash_profile
+├── .tmux.conf → dotfiles/config/tmux.conf
+├── .tmux-themepack/       # Tmux themes
+├── .vimrc → dotfiles/config/vimrc (if --vim used)
+└── CLAUDE.md              # Documentation
+
+/home/ubuntu/
+├── .zshenv → /scratch/chloeloughridge/.zshenv
+├── .bashrc → /scratch/chloeloughridge/.bashrc
+├── .bash_profile → /scratch/chloeloughridge/.bash_profile
+├── .profile → /scratch/chloeloughridge/.profile
+├── .config/zsh → /scratch/chloeloughridge/.config/zsh
+├── .tmux.conf → /scratch/chloeloughridge/.tmux.conf
+├── .vimrc → /scratch/chloeloughridge/.vimrc
+├── git → /scratch/chloeloughridge/git
+└── CLAUDE.md → /scratch/chloeloughridge/CLAUDE.md
+```
+
+---
+
+## Key Modifications from Standard Dotfiles
+
+### 1. Persistent Storage (deploy.sh)
+- Default `PERSIST_DIR=/scratch/chloeloughridge`
+- All configs stored in persistent directory
+- Symlinks from `$HOME` to persistent locations
+- Survives instance reboots/rebuilds
+
+### 2. Auto-Launch Zsh (deploy.sh)
+- `.bashrc` automatically execs zsh when bash starts
+- Works for SSH, new terminals, and interactive shells
+- Prevents infinite loops with safety checks
+
+### 3. Conditional File Sourcing (config/zshenv, config/zshrc)
+- All optional dependencies checked before sourcing
+- No errors if cargo, brew, uv, or other tools not installed
+- Gracefully skips missing files
+
+### 4. API Key Exports (config/zshrc)
+- `WANDB_API_KEY` and `HF_TOKEN` automatically exported
+- Available to all scripts and Python environments
+
+### 5. Git Directory Persistence (deploy.sh)
+- `~/git` symlinked to `/scratch/chloeloughridge/git`
+- All git repos automatically in persistent storage
+
+---
+
+## Configuration Files
+
+### config/zshenv
+- XDG base directory specification
+- Sets `ZDOTDIR` to `~/.config/zsh`
+- Conditionally sources cargo and homebrew environments
+
+### config/zshrc
+- Loads oh-my-zsh and plugins
+- Sources aliases, extras, and key bindings
+- Exports API keys (WANDB, HuggingFace)
+- Configures pyenv, fnm, micromamba (if installed)
+- Displays startup banner from `start.txt`
+
+### config/aliases.sh
+- Common shell aliases and shortcuts
+- Project-specific aliases
+
+### config/extras.sh
+- Additional shell functions and utilities
+
+### config/key_bindings.sh
+- Custom zsh key bindings
+
+### config/tmux.conf
+- Tmux configuration with custom keybindings
+
+### config/vimrc
+- Basic vim configuration
+
+### config/p10k.zsh
+- Powerlevel10k theme configuration
+- Reconfigure with: `p10k configure`
+
+---
+
+## Customization
+
+### Adding Aliases
+Edit `config/aliases.sh` and add your aliases:
+```bash
+alias myalias='command'
+```
+
+### Adding Environment Variables
+Edit `config/zshrc` and add exports:
+```bash
+export MY_VAR="value"
+```
+
+### Installing Additional Tools
+Edit `install.sh` and add to the package installation section:
+```bash
+sudo apt-get install -y your-package
+```
+
+### Changing Persistent Directory
+Set environment variable before deploying:
+```bash
+PERSIST_DIR=/your/custom/path ./deploy.sh
+```
+
+---
+
+## Troubleshooting
+
+### Shell shows "no such file or directory" errors
+- All optional dependencies are checked conditionally
+- If you see these errors, the config files may need updating
+- Check that conditional checks use `-f` for files, `-d` for directories
+
+### Zsh doesn't auto-launch
+- Verify `.bashrc` is symlinked: `ls -la ~/.bashrc`
+- Check `.bash_profile` and `.profile` exist
+- Test manually: `bash -i` should launch zsh
+
+### Oh-my-zsh or plugins missing
+- Run `./install.sh --zsh --force` to reinstall
+- Check that `/scratch/chloeloughridge/.config/zsh/ohmyzsh/` exists
+
+### Configs don't persist after reboot
+- Verify all configs are in `/scratch/chloeloughridge/`
+- Check symlinks: `ls -la ~/` should show symlinks to persistent directory
+- Ensure `/scratch/chloeloughridge/` is actually persistent storage on your system
+
+---
+
+## Advanced Usage
+
+### Using Additional Alias Sets
+```bash
+./deploy.sh --aliases=speechmatics,custom
+```
+
+This sources additional alias files from `config/aliases_<name>.sh`
+
+### Reinstalling Everything
+```bash
+./install.sh --zsh --force
 ./deploy.sh --vim
 ```
 
-### Step 3
-This set of dotfiles uses the powerlevel10k theme for zsh, this makes your terminal look better and adds lots of useful features, e.g. env indicators, git status etc...
-
-Note that as the provided powerlevel10k config uses special icons it is *highly recommended* you install a custom font that supports these icons. A guide to do that is [here](https://github.com/romkatv/powerlevel10k#meslo-nerd-font-patched-for-powerlevel10k). Alternatively you can set up powerlevel10k to not use these icons (but it won't look as good!)
-
-This repo comes with a preconfigured powerlevel10k theme in [`./config/p10k.zsh`](./config/p10k.zsh) but you can reconfigure this by running `p10k configure` which will launch an interactive window. 
-
-
-When you get to the last two options below
-```
-Powerlevel10k config file already exists.
-Overwrite ~/git/dotfiles/config/p10k.zsh?
-# Press y for YES
-
-Apply changes to ~/.zshrc?
-# Press n for NO 
-```
-
-## Getting to know these dotfiles
-
-* Any software or command line tools you need, add them to the [install.sh](./install.sh) script. Try adding a new command line tool to the install script.
-* Any new plugins or environment setup, add them to the [config/zshrc.sh](./config/zshrc.sh) script.
-* Any aliases you need, add them to the [config/aliases.sh](./config/aliases.sh) script. Try adding your own alias to the bottom of the file. For example, try setting `cd1` to your most used git repo so you can just type `cd1` to get to it.
-* Any setup you do in a new RunPod, add it to [runpod/runpod_setup.sh](./runpod/runpod_setup.sh).
-
-## Docker image for runpod
-
-To build the docker image for runpod, you can run the following command:
-
+### Testing in Docker
 ```bash
-export DOCKER_DEFAULT_PLATFORM=linux/amd64
-docker build -f runpod/johnh_dev.Dockerfile -t jplhughes1/runpod-dev .
-
-# Build with buildx
-docker buildx create --name mybuilder --use
-docker buildx build --platform linux/amd64 -f runpod/johnh_dev.Dockerfile -t jplhughes1/runpod-dev . --push
-
+docker run -it -v $PWD/runpod/entrypoint.sh:/dotfiles/runpod/entrypoint.sh \
+  -e USE_ZSH=true jplhughes1/runpod-dev /bin/zsh
 ```
 
-To test it
+---
 
+## Security Notes
+
+⚠️ **API Keys**: This setup stores API keys in plaintext in `config/zshrc`. Keep your dotfiles repository private if pushing to GitHub or other public locations.
+
+⚠️ **Credentials**: Never commit sensitive credentials to version control. Consider using environment-specific config files outside the repo for production systems.
+
+---
+
+## Maintenance
+
+### Updating Dotfiles
 ```bash
-docker run -it -v $PWD/runpod/entrypoint.sh:/dotfiles/runpod/entrypoint.sh -e USE_ZSH=true jplhughes1/runpod-dev /bin/zsh
+cd /scratch/chloeloughridge/git/dotfiles
+git pull
+./deploy.sh --vim  # Reapply symlinks if needed
 ```
 
-To push it to docker hub
-
+### Updating Oh-My-Zsh
 ```bash
-docker push jplhughes1/runpod-dev
+cd ~/.config/zsh/ohmyzsh
+git pull
 ```
 
+### Updating Plugins
+```bash
+cd ~/.config/zsh/ohmyzsh/custom/plugins/<plugin-name>
+git pull
+```
+
+---
+
+## What Makes This Setup Different
+
+This dotfiles repo has been specifically configured for persistent storage setups (like GPU compute instances, RunPod, etc.) where:
+
+1. **Home directory is ephemeral** but `/scratch/` persists
+2. **Automatic shell configuration** is desired (auto-launch zsh)
+3. **API keys need to be available** without manual setup each time
+4. **Git repositories should persist** across instance restarts
+5. **No manual intervention** should be needed after initial setup
+
+If you're setting this up on a standard machine where `$HOME` persists normally, you can set `PERSIST_DIR=$HOME` when running `deploy.sh`.
+
+---
+
+## Quick Reference
+
+### Most Common Commands
+```bash
+# Clone and setup
+git clone <repo> /scratch/chloeloughridge/git/dotfiles
+cd /scratch/chloeloughridge/git/dotfiles
+./install.sh --zsh
+./deploy.sh --vim
+
+# Reconfigure powerlevel10k theme
+p10k configure
+
+# Reload shell config
+exec zsh
+
+# Check what's exported
+env | grep -E "WANDB|HF_TOKEN"
+```
+
+### File Locations
+- **Dotfiles repo**: `/scratch/chloeloughridge/git/dotfiles/`
+- **Zsh config**: `~/.config/zsh/.zshrc`
+- **Oh-my-zsh**: `~/.config/zsh/ohmyzsh/`
+- **Persistent storage**: `/scratch/chloeloughridge/`
+- **Custom bins**: `/scratch/chloeloughridge/git/dotfiles/custom_bins/`
+
+### Useful Links
+- [Oh My Zsh Documentation](https://github.com/ohmyzsh/ohmyzsh)
+- [Powerlevel10k Documentation](https://github.com/romkatv/powerlevel10k)
+- [Nerd Fonts (for icons)](https://github.com/romkatv/powerlevel10k#meslo-nerd-font-patched-for-powerlevel10k)
+- [XDG Base Directory Spec](https://wiki.archlinux.org/title/XDG_Base_Directory)

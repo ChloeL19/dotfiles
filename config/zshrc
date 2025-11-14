@@ -21,12 +21,12 @@ source $CONFIG_DIR/key_bindings.sh
 add_to_path "${DOT_DIR}/custom_bins"
 
 # for uv
-if [ -d "$HOME/.local/bin" ]; then
+if [ -f "$HOME/.local/bin/env" ]; then
   source $HOME/.local/bin/env
 fi
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-if [ -d "$HOME/.cargo" ]; then
+if [ -f "$HOME/.cargo/env" ]; then
   . "$HOME/.cargo/env"
 fi
 
@@ -55,11 +55,13 @@ if [ -d "$FNM_PATH" ]; then
 fi
 
 if command -v ask-sh &> /dev/null; then
-  export ASK_SH_OPENAI_API_KEY=$(cat $HOME/.openai_api_key)
-  export ASK_SH_OPENAI_MODEL=gpt-4o-mini
-  eval "$(ask-sh --init)"
+  if [ -f "$HOME/.openai_api_key" ]; then
+    export ASK_SH_OPENAI_API_KEY=$(cat $HOME/.openai_api_key)
+    export ASK_SH_OPENAI_MODEL=gpt-4o-mini
+    eval "$(ask-sh --init)"
+  fi
 fi
 
-cat $CONFIG_DIR/start.txt
+# Export API keys
 
-. "$HOME/.local/bin/env"
+cat $CONFIG_DIR/start.txt

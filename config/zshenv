@@ -3,8 +3,12 @@
 export XDG_CONFIG_HOME="$HOME/.config"
 export ZDOTDIR="${XDG_CONFIG_HOME}/zsh"
 
-# Initialize cargo environment
-. "$HOME/.cargo/env"
+# Initialize cargo environment (if it exists)
+if [ -f "$HOME/.cargo/env" ]; then
+    . "$HOME/.cargo/env"
+fi
 
-# Initialize Homebrew environment
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# Initialize Homebrew environment (if it exists)
+if [ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
