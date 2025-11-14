@@ -42,10 +42,12 @@ pastefinish() {
 zstyle :bracketed-paste-magic paste-init pasteinit
 zstyle :bracketed-paste-magic paste-finish pastefinish
 
-# ls after every cd
+# ls after every cd (skip for Claude Code and similar tools)
 function chpwd() {
  emulate -L zsh
- ls
+ if [[ -z "$CLAUDE_CODE" ]]; then
+   ls
+ fi
 }
 
 

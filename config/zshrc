@@ -1,8 +1,8 @@
 CONFIG_DIR=$(dirname $(realpath ${(%):-%x}))
 DOT_DIR=$CONFIG_DIR/..
 
-# Instant prompt
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+# Instant prompt (skip for non-interactive shells or restricted environments like Claude Code)
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]] && [[ -o interactive ]] && [[ -z "$CLAUDE_CODE" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 export TERM="xterm-256color"
@@ -64,4 +64,8 @@ fi
 
 # Export API keys
 
-cat $CONFIG_DIR/start.txt
+# Only show ASCII art in fully interactive shells (skip for Claude Code and similar tools)
+if [[ -o interactive ]] && [[ -z "$CLAUDE_CODE" ]]; then
+  cat $CONFIG_DIR/start.txt
+fi
+export PATH="$HOME/.local/bin:$PATH"

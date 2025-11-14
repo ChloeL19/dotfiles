@@ -3,6 +3,11 @@
 export XDG_CONFIG_HOME="$HOME/.config"
 export ZDOTDIR="${XDG_CONFIG_HOME}/zsh"
 
+# Add ~/.local/bin to PATH if it exists
+if [ -d "$HOME/.local/bin" ]; then
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+
 # Initialize cargo environment (if it exists)
 if [ -f "$HOME/.cargo/env" ]; then
     . "$HOME/.cargo/env"

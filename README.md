@@ -41,6 +41,7 @@ That's it! Your shell is now fully configured with persistence.
 - ✅ **Git directory**: `~/git` symlinked to persistent storage
 - ✅ **CLAUDE.md**: Symlinked to home directory for easy access
 - ✅ **XDG-compliant**: Configs stored in `~/.config/zsh/`
+- ✅ **Claude Code compatible**: Works seamlessly with Anthropic's Claude CLI tool
 
 ### Environment Variables
 The following are automatically exported on shell startup:
@@ -165,6 +166,15 @@ The following are automatically exported on shell startup:
 - `~/git` symlinked to `/scratch/chloeloughridge/git`
 - All git repos automatically in persistent storage
 
+### 6. Claude Code Compatibility (config/zshrc, config/extras.sh)
+- **Instant prompt disabled** for non-interactive shells
+- **ASCII art startup** skipped when `CLAUDE_CODE` env var is set
+- **Auto-ls on cd** disabled in restricted environments
+- **~/.local/bin** added to PATH for Claude CLI access
+- Ensures Claude Code can properly initialize terminal without interference
+
+**Important**: These features check for the `CLAUDE_CODE` environment variable. Normal interactive zsh sessions are unaffected.
+
 ---
 
 ## Configuration Files
@@ -172,6 +182,7 @@ The following are automatically exported on shell startup:
 ### config/zshenv
 - XDG base directory specification
 - Sets `ZDOTDIR` to `~/.config/zsh`
+- Adds `~/.local/bin` to PATH for user-installed binaries (e.g., Claude Code)
 - Conditionally sources cargo and homebrew environments
 
 ### config/zshrc
@@ -179,7 +190,8 @@ The following are automatically exported on shell startup:
 - Sources aliases, extras, and key bindings
 - Exports API keys (WANDB, HuggingFace)
 - Configures pyenv, fnm, micromamba (if installed)
-- Displays startup banner from `start.txt`
+- Displays startup banner from `start.txt` (skipped for Claude Code)
+- Disables Powerlevel10k instant prompt for non-interactive shells
 
 ### config/aliases.sh
 - Common shell aliases and shortcuts
@@ -187,6 +199,9 @@ The following are automatically exported on shell startup:
 
 ### config/extras.sh
 - Additional shell functions and utilities
+- Auto-ls on directory change (disabled for Claude Code)
+- Extract function for archives
+- Git quick commit functions
 
 ### config/key_bindings.sh
 - Custom zsh key bindings
@@ -252,6 +267,18 @@ PERSIST_DIR=/your/custom/path ./deploy.sh
 - Check symlinks: `ls -la ~/` should show symlinks to persistent directory
 - Ensure `/scratch/chloeloughridge/` is actually persistent storage on your system
 
+### Claude Code doesn't work in zsh
+- Verify `~/.local/bin` is in PATH: `echo $PATH | grep local`
+- Check Claude is installed: `ls -la ~/.local/bin/claude`
+- If "command not found", reload shell: `exec zsh`
+- Ensure `config/zshenv` includes PATH export (should be automatic)
+- The setup disables Powerlevel10k instant prompt and ASCII art for Claude Code
+
+### Claude Code hangs or shows garbled output
+- This was caused by Powerlevel10k instant prompt interfering with terminal initialization
+- The fix is already in `config/zshrc:5-7` (checks for interactive shells and `$CLAUDE_CODE` var)
+- If still having issues, manually set: `export CLAUDE_CODE=1` before launching
+
 ---
 
 ## Advanced Usage
@@ -274,6 +301,26 @@ This sources additional alias files from `config/aliases_<name>.sh`
 docker run -it -v $PWD/runpod/entrypoint.sh:/dotfiles/runpod/entrypoint.sh \
   -e USE_ZSH=true jplhughes1/runpod-dev /bin/zsh
 ```
+
+### Using with Claude Code
+This setup is fully compatible with [Claude Code](https://docs.claude.com/en/docs/claude-code), Anthropic's CLI tool:
+
+```bash
+# Install Claude Code (if not already installed)
+# Follow instructions at https://docs.claude.com/en/docs/claude-code
+
+# After deploying dotfiles, Claude should be in PATH
+claude
+
+# If you get "command not found", reload your shell
+exec zsh
+```
+
+**How it works**:
+- `~/.local/bin` (where Claude installs) is automatically added to PATH in `config/zshenv`
+- Powerlevel10k instant prompt is disabled for non-interactive shells to prevent terminal conflicts
+- ASCII art and auto-ls features skip execution when `$CLAUDE_CODE` environment variable is detected
+- All interactive zsh features remain fully functional in normal terminal sessions
 
 ---
 
