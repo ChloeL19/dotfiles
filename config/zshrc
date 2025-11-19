@@ -38,7 +38,7 @@ fi
 
 if [ -f "$HOME/.local/bin/micromamba" ]; then
   export MAMBA_EXE="$HOME/.local/bin/micromamba"
-  export MAMBA_ROOT_PREFIX="/scratch/chloeloughridge/micromamba"
+  export MAMBA_ROOT_PREFIX="/data/chloeloughridge/micromamba"
   __mamba_setup="$("$MAMBA_EXE" shell hook --shell zsh --root-prefix "$MAMBA_ROOT_PREFIX" 2> /dev/null)"
   if [ $? -eq 0 ]; then
       eval "$__mamba_setup"
@@ -63,8 +63,8 @@ if command -v ask-sh &> /dev/null; then
 fi
 
 # Source API keys from persistent .env file (if it exists)
-if [ -f "/scratch/chloeloughridge/.env" ]; then
-  source /scratch/chloeloughridge/.env
+if [ -f "/data/chloeloughridge/.env" ]; then
+  source /data/chloeloughridge/.env
 fi
 
 # Only show ASCII art in fully interactive shells (skip for Claude Code and similar tools)
