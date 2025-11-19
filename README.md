@@ -1,13 +1,13 @@
 # Dotfiles - Persistent Configuration Setup
 
-ZSH, Tmux, Vim, and shell setup with persistent storage configured for `/scratch/chloeloughridge/`.
+ZSH, Tmux, Vim, and shell setup with persistent storage configured for `/data/chloeloughridge/`.
 
 ## Quick Start (Most Common Use Case)
 
 ```bash
 # Clone the repo
-git clone <repo-url> /scratch/chloeloughridge/git/dotfiles
-cd /scratch/chloeloughridge/git/dotfiles
+git clone <repo-url> /data/chloeloughridge/git/dotfiles
+cd /data/chloeloughridge/git/dotfiles
 
 # Install zsh and dependencies
 ./install.sh --zsh
@@ -19,12 +19,12 @@ cd /scratch/chloeloughridge/git/dotfiles
 zsh
 
 # (Optional) Add your API keys
-nano /scratch/chloeloughridge/.env
+nano /data/chloeloughridge/.env
 ```
 
 That's it! Your shell is now fully configured with persistence.
 
-**Don't forget**: Edit `/scratch/chloeloughridge/.env` to add your API keys (WANDB, HuggingFace, etc). See `.env.example` for the template.
+**Don't forget**: Edit `/data/chloeloughridge/.env` to add your API keys (WANDB, HuggingFace, etc). See `.env.example` for the template.
 
 ---
 
@@ -40,16 +40,16 @@ That's it! Your shell is now fully configured with persistence.
 - **System tools**: jq, ncdu, nvtop, htop, lsof, rsync, nano, less
 
 ### Auto-Configured Features
-- ✅ **Persistent storage**: All configs symlinked to `/scratch/chloeloughridge/`
+- ✅ **Persistent storage**: All configs symlinked to `/data/chloeloughridge/`
 - ✅ **Auto-launch Zsh**: Bash automatically launches zsh on startup
-- ✅ **API keys managed securely**: Stored in `/scratch/chloeloughridge/.env` (not in version control)
+- ✅ **API keys managed securely**: Stored in `/data/chloeloughridge/.env` (not in version control)
 - ✅ **Git directory**: `~/git` symlinked to persistent storage
 - ✅ **CLAUDE.md**: Symlinked to home directory for easy access
 - ✅ **XDG-compliant**: Configs stored in `~/.config/zsh/`
 - ✅ **Claude Code compatible**: Works seamlessly with Anthropic's Claude CLI tool
 
 ### Environment Variables
-API keys and secrets are stored in `/scratch/chloeloughridge/.env` and automatically sourced on shell startup.
+API keys and secrets are stored in `/data/chloeloughridge/.env` and automatically sourced on shell startup.
 
 **Supported environment variables:**
 - `WANDB_API_KEY`: Weights & Biases authentication
@@ -66,7 +66,7 @@ API keys and secrets are stored in `/scratch/chloeloughridge/.env` and automatic
 
 ### Prerequisites
 - Linux system (tested on Ubuntu 22.04)
-- Access to `/scratch/chloeloughridge/` directory for persistent storage
+- Access to `/data/chloeloughridge/` directory for persistent storage
 - Sudo privileges for installing packages
 
 ### Step 1: Install Dependencies
@@ -91,8 +91,8 @@ API keys and secrets are stored in `/scratch/chloeloughridge/.env` and automatic
 7. Tmux themepack
 
 **Where things are installed:**
-- Oh-my-zsh → `/scratch/chloeloughridge/.config/zsh/ohmyzsh/`
-- Tmux themepack → `/scratch/chloeloughridge/.tmux-themepack/`
+- Oh-my-zsh → `/data/chloeloughridge/.config/zsh/ohmyzsh/`
+- Tmux themepack → `/data/chloeloughridge/.tmux-themepack/`
 - UV → `~/.local/bin/`
 
 ### Step 2: Deploy Configuration
@@ -106,25 +106,25 @@ API keys and secrets are stored in `/scratch/chloeloughridge/.env` and automatic
 - `--aliases=<name1,name2>`: Source additional alias files (e.g., `--aliases=speechmatics`)
 
 **Environment Variables:**
-- `PERSIST_DIR`: Override persistent directory (default: `/scratch/chloeloughridge`)
+- `PERSIST_DIR`: Override persistent directory (default: `/data/chloeloughridge`)
 
 **What it does:**
-1. Creates persistent storage structure in `/scratch/chloeloughridge/`
+1. Creates persistent storage structure in `/data/chloeloughridge/`
 2. Symlinks all configs to persistent directory
 3. Symlinks from `$HOME` to persistent configs
 4. Creates `.bashrc`, `.bash_profile`, `.profile` for auto-launching zsh
 5. Symlinks `~/git` to persistent storage
 6. Symlinks `~/CLAUDE.md` (if exists) to persistent storage
-7. Creates `/scratch/chloeloughridge/.env` template (if it doesn't exist)
+7. Creates `/data/chloeloughridge/.env` template (if it doesn't exist)
 
-**Note**: After deployment, you should edit `/scratch/chloeloughridge/.env` to add your API keys. You can use `.env.example` in the repo as a template.
+**Note**: After deployment, you should edit `/data/chloeloughridge/.env` to add your API keys. You can use `.env.example` in the repo as a template.
 
 ---
 
 ## File Structure After Installation
 
 ```
-/scratch/chloeloughridge/
+/data/chloeloughridge/
 ├── git/
 │   └── dotfiles/          # This repo
 │       ├── .env.example   # Template for .env file
@@ -144,15 +144,15 @@ API keys and secrets are stored in `/scratch/chloeloughridge/.env` and automatic
 └── CLAUDE.md              # Documentation
 
 /home/ubuntu/
-├── .zshenv → /scratch/chloeloughridge/.zshenv
-├── .bashrc → /scratch/chloeloughridge/.bashrc
-├── .bash_profile → /scratch/chloeloughridge/.bash_profile
-├── .profile → /scratch/chloeloughridge/.profile
-├── .config/zsh → /scratch/chloeloughridge/.config/zsh
-├── .tmux.conf → /scratch/chloeloughridge/.tmux.conf
-├── .vimrc → /scratch/chloeloughridge/.vimrc
-├── git → /scratch/chloeloughridge/git
-└── CLAUDE.md → /scratch/chloeloughridge/CLAUDE.md
+├── .zshenv → /data/chloeloughridge/.zshenv
+├── .bashrc → /data/chloeloughridge/.bashrc
+├── .bash_profile → /data/chloeloughridge/.bash_profile
+├── .profile → /data/chloeloughridge/.profile
+├── .config/zsh → /data/chloeloughridge/.config/zsh
+├── .tmux.conf → /data/chloeloughridge/.tmux.conf
+├── .vimrc → /data/chloeloughridge/.vimrc
+├── git → /data/chloeloughridge/git
+└── CLAUDE.md → /data/chloeloughridge/CLAUDE.md
 ```
 
 ---
@@ -160,7 +160,7 @@ API keys and secrets are stored in `/scratch/chloeloughridge/.env` and automatic
 ## Key Modifications from Standard Dotfiles
 
 ### 1. Persistent Storage (deploy.sh)
-- Default `PERSIST_DIR=/scratch/chloeloughridge`
+- Default `PERSIST_DIR=/data/chloeloughridge`
 - All configs stored in persistent directory
 - Symlinks from `$HOME` to persistent locations
 - Survives instance reboots/rebuilds
@@ -175,14 +175,14 @@ API keys and secrets are stored in `/scratch/chloeloughridge/.env` and automatic
 - No errors if cargo, brew, uv, or other tools not installed
 - Gracefully skips missing files
 
-### 4. API Key Management (config/zshrc, /scratch/.env)
-- API keys stored in `/scratch/chloeloughridge/.env` (not in version control)
+### 4. API Key Management (config/zshrc, /data/.env)
+- API keys stored in `/data/chloeloughridge/.env` (not in version control)
 - Automatically sourced by zshrc on shell startup
 - Available to all scripts and Python environments
 - Supports WANDB, HuggingFace, Anthropic, OpenAI, and Docent keys
 
 ### 5. Git Directory Persistence (deploy.sh)
-- `~/git` symlinked to `/scratch/chloeloughridge/git`
+- `~/git` symlinked to `/data/chloeloughridge/git`
 - All git repos automatically in persistent storage
 
 ### 6. Claude Code Compatibility (config/zshrc, config/extras.sh)
@@ -207,7 +207,7 @@ API keys and secrets are stored in `/scratch/chloeloughridge/.env` and automatic
 ### config/zshrc
 - Loads oh-my-zsh and plugins
 - Sources aliases, extras, and key bindings
-- Sources API keys from `/scratch/chloeloughridge/.env`
+- Sources API keys from `/data/chloeloughridge/.env`
 - Configures pyenv, fnm, micromamba (if installed)
 - Displays startup banner from `start.txt` (skipped for Claude Code)
 - Disables Powerlevel10k instant prompt for non-interactive shells
@@ -246,7 +246,7 @@ alias myalias='command'
 ```
 
 ### Adding Environment Variables and API Keys
-Edit `/scratch/chloeloughridge/.env` and add your secrets:
+Edit `/data/chloeloughridge/.env` and add your secrets:
 ```bash
 export MY_API_KEY="your-key-here"
 export MY_VAR="value"
@@ -282,12 +282,12 @@ PERSIST_DIR=/your/custom/path ./deploy.sh
 
 ### Oh-my-zsh or plugins missing
 - Run `./install.sh --zsh --force` to reinstall
-- Check that `/scratch/chloeloughridge/.config/zsh/ohmyzsh/` exists
+- Check that `/data/chloeloughridge/.config/zsh/ohmyzsh/` exists
 
 ### Configs don't persist after reboot
-- Verify all configs are in `/scratch/chloeloughridge/`
+- Verify all configs are in `/data/chloeloughridge/`
 - Check symlinks: `ls -la ~/` should show symlinks to persistent directory
-- Ensure `/scratch/chloeloughridge/` is actually persistent storage on your system
+- Ensure `/data/chloeloughridge/` is actually persistent storage on your system
 
 ### Claude Code doesn't work in zsh
 - Verify `~/.local/bin` is in PATH: `echo $PATH | grep local`
@@ -302,10 +302,10 @@ PERSIST_DIR=/your/custom/path ./deploy.sh
 - If still having issues, manually set: `export CLAUDE_CODE=1` before launching
 
 ### API keys not available in scripts
-- Check that `/scratch/chloeloughridge/.env` exists: `ls -la /scratch/chloeloughridge/.env`
+- Check that `/data/chloeloughridge/.env` exists: `ls -la /data/chloeloughridge/.env`
 - Verify keys are exported: `env | grep -E "WANDB|HF_TOKEN|ANTHROPIC|OPENAI"`
 - Ensure zshrc is sourcing the file: `grep "source.*\.env" ~/.config/zsh/.zshrc`
-- If keys are missing, add them to `/scratch/chloeloughridge/.env` with `export` prefix
+- If keys are missing, add them to `/data/chloeloughridge/.env` with `export` prefix
 - Reload shell: `exec zsh`
 
 ---
@@ -355,9 +355,9 @@ exec zsh
 
 ## Security Notes
 
-⚠️ **API Keys**: This setup stores API keys in `/scratch/chloeloughridge/.env`, which is **NOT** checked into version control. This file is stored in persistent storage only. Your dotfiles repository is safe to push to GitHub as long as you don't commit the `.env` file.
+⚠️ **API Keys**: This setup stores API keys in `/data/chloeloughridge/.env`, which is **NOT** checked into version control. This file is stored in persistent storage only. Your dotfiles repository is safe to push to GitHub as long as you don't commit the `.env` file.
 
-⚠️ **Credentials**: The `.env` file should never be committed to version control. The `.gitignore` in this repo excludes `.env` files by default. If you're storing additional credentials, add them to `/scratch/chloeloughridge/.env`.
+⚠️ **Credentials**: The `.env` file should never be committed to version control. The `.gitignore` in this repo excludes `.env` files by default. If you're storing additional credentials, add them to `/data/chloeloughridge/.env`.
 
 ⚠️ **Backup**: Since `.env` is not in version control, make sure to back it up separately if you rebuild your instance or move to a new system.
 
@@ -367,7 +367,7 @@ exec zsh
 
 ### Updating Dotfiles
 ```bash
-cd /scratch/chloeloughridge/git/dotfiles
+cd /data/chloeloughridge/git/dotfiles
 git pull
 ./deploy.sh --vim  # Reapply symlinks if needed
 ```
@@ -390,7 +390,7 @@ git pull
 
 This dotfiles repo has been specifically configured for persistent storage setups (like GPU compute instances, RunPod, etc.) where:
 
-1. **Home directory is ephemeral** but `/scratch/` persists
+1. **Home directory is ephemeral** but `/data/` persists
 2. **Automatic shell configuration** is desired (auto-launch zsh)
 3. **API keys need to be available** without manual setup each time
 4. **Git repositories should persist** across instance restarts
@@ -405,8 +405,8 @@ If you're setting this up on a standard machine where `$HOME` persists normally,
 ### Most Common Commands
 ```bash
 # Clone and setup
-git clone <repo> /scratch/chloeloughridge/git/dotfiles
-cd /scratch/chloeloughridge/git/dotfiles
+git clone <repo> /data/chloeloughridge/git/dotfiles
+cd /data/chloeloughridge/git/dotfiles
 ./install.sh --zsh
 ./deploy.sh --vim
 
@@ -420,16 +420,16 @@ exec zsh
 env | grep -E "WANDB|HF_TOKEN|ANTHROPIC|OPENAI|DOCENT"
 
 # Edit API keys
-nano /scratch/chloeloughridge/.env
+nano /data/chloeloughridge/.env
 ```
 
 ### File Locations
-- **Dotfiles repo**: `/scratch/chloeloughridge/git/dotfiles/`
+- **Dotfiles repo**: `/data/chloeloughridge/git/dotfiles/`
 - **Zsh config**: `~/.config/zsh/.zshrc`
 - **Oh-my-zsh**: `~/.config/zsh/ohmyzsh/`
-- **Persistent storage**: `/scratch/chloeloughridge/`
-- **API Keys & Secrets**: `/scratch/chloeloughridge/.env`
-- **Custom bins**: `/scratch/chloeloughridge/git/dotfiles/custom_bins/`
+- **Persistent storage**: `/data/chloeloughridge/`
+- **API Keys & Secrets**: `/data/chloeloughridge/.env`
+- **Custom bins**: `/data/chloeloughridge/git/dotfiles/custom_bins/`
 
 ### Useful Links
 - [Oh My Zsh Documentation](https://github.com/ohmyzsh/ohmyzsh)
